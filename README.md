@@ -111,11 +111,6 @@ terraform apply tfplan
  
 ---
 
-## Future Improvements
-
-* Add Dataplex for data governance
-* Add VPC Service Controls for data exfiltration prevention
-
 ## Environment Promotion
  
 Environments share identical module composition. To promote from dev → staging → prod:
