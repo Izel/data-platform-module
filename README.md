@@ -20,19 +20,20 @@ A **GCP** production-ready, reusable **Terraform module** that provisions a secu
 
 ## Module Structure
 
-data-platform-module/
-├── modules/
-│   ├── networking/
-│   ├── iam/
-│   ├── storage/
-│   ├── bigquery/
-│   ├── security/
-│   └── monitoring/
-├── environments/
-│   ├── dev/
-│   ├── staging/
-│   └── prod/
+data-platform-module\
+├── modules\
+│   ├── networking\
+│   ├── iam\
+│   ├── storage\
+│   ├── bigquery\
+│   ├── security\
+│   └── monitoring\
+├── environments\
+│   ├── dev\
+│   ├── staging\
+│   └── prod\
 └── README.md
+
 
 ## Key Design Decisions
 
