@@ -82,7 +82,12 @@ git clone https://github.com/Izel/data-platform-module.git
 cd data-platform-module
 ```
  
-### 2. Authenticate with GCP
+### 2. Project Set Up
+
+1. [Create a project](https://developers.google.com/workspace/guides/create-project) via web console
+2. Associate the project to a [billing account](https://docs.cloud.google.com/billing/docs/how-to/modify-project).
+
+### 3. Authenticate with GCP
  
 ```bash
 gcloud auth login
@@ -91,18 +96,7 @@ gcloud config set project <YOUR_PROJECT_ID>
  
 ### 3. Configure your environment
  
-Edit the relevant `terraform.tfvars` file:
- 
-```bash
-cd environments/dev
-cp terraform.tfvars.example terraform.tfvars
-# Edit terraform.tfvars with your project-specific values
-```
-
-### 4. Setup
-1. [Create a project](https://developers.google.com/workspace/guides/create-project) via web console
-2. Associate the project to a [billing account](https://docs.cloud.google.com/billing/docs/how-to/modify-project).
-3. Create a `terraform.tfvars` file for each environment folder.
+Create the `terraform.tfvars` file per environment:
 ```
 ├── environments\
 │   ├── dev\
@@ -113,8 +107,8 @@ cp terraform.tfvars.example terraform.tfvars
 │      ├── terraform.tfvars  
 ```
 
-4. Copy the variables definition below for each `terraform.tfvars` and modify it according to your values:
-```terraform
+4. Edit the variable definitions below for each `terraform.tfvars` according to your values and environment:
+```bash
 # The project id  created in GCP. It must be associated to a billing account
 project_id = "<YOUR_PROJECT_ID>" # p.e "my-data-infra-project"
 
@@ -135,8 +129,6 @@ notification_channel_ids = []
 ```
 > [!IMPORTANT] 
 > Hashicorp recommends to **avoid pushing** the `terraform.tfvars` file to public repository (Github, GitLab, BitBucket, etc.).
-
----
 
 ### 5. Deploy
  
