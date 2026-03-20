@@ -14,9 +14,7 @@ A **GCP** production-ready, reusable **Terraform module** that provisions a secu
 | Observability      | Cloud Logging, Monitoring, Alerts  |
 | CI/CD              | Cloud Build                        |
 
-## Architecture
-
-[architecture diagram]
+---
 
 ## Module Structure
 
@@ -100,8 +98,47 @@ cd environments/dev
 cp terraform.tfvars.example terraform.tfvars
 # Edit terraform.tfvars with your project-specific values
 ```
- 
-### 4. Deploy
+
+### 4. Setup
+1. [Create a project](https://developers.google.com/workspace/guides/create-project) via web console
+2. Associate the project to a [billing account](https://docs.cloud.google.com/billing/docs/how-to/modify-project).
+3. Create a `terraform.tfvars` file for each environment folder.
+```
+├── environments\
+│   ├── dev\
+│      ├── terraform.tfvars  
+│   ├── staging\
+│      ├── terraform.tfvars  
+│   ├── prod\
+│      ├── terraform.tfvars  
+```
+
+4. Copy the variables definition below for each `terraform.tfvars` and modify it according to your values:
+```terraform
+# The project id  created in GCP. It must be associated to a billing account
+project_id = "<YOUR_PROJECT_ID>" # p.e "my-data-infra-project"
+
+# Region for the project resources location.
+region = "<YOUR_SELECTED_REGION>" # p.e "europe-west2"
+
+# The current deployment environment 
+environment = "<YOUR_ENVIRONMENT>" # p.e "dev"
+
+# The Subnet IP addres range and network mask
+subnet_cidr = "<YOUR_SUBNET_IP_AND_MASK>" # p.e "10.0.0.0/24"
+
+# KMS key rotation — shorter in dev for testing. Defined in Seconds
+key_rotation_period = "<YOUR_KEY_ROTATION_PERIOD>" # p.e "2592000s" wich is 30 days in secons
+
+# Monitoring — leave empty in dev if no notification channels set up
+notification_channel_ids = []
+```
+> [!IMPORTANT] 
+> Hashicorp recommends to **avoid pushing** the `terraform.tfvars` file to public repository (Github, GitLab, BitBucket, etc.).
+
+---
+
+### 5. Deploy
  
 ```bash
 terraform init
