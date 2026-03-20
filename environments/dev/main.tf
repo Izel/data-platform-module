@@ -1,68 +1,70 @@
-locals {
-  network_name = "${var.project_id}-${var.environment}-vpc"
+#
+# Modules definition
+#
+
+# 1. Security (KMS + Secret Manager)
+# All other modules depend on KMS key IDs
+module "security" {
+  source = "../../modules/security"
+
+  project_id          = var.project_id
+  environment         = var.environment
+  region              = var.region
+  key_rotation_period = var.key_rotation_period
 }
 
-# VPC Network 
-resource "google_compute_network" "vpc" {
-  project                 = var.project_id
-  name                    = local.network_name
-  auto_create_subnetworks = false
-  description             = "Data platform VPC for ${var.environment} environment"
+# 2. Networking
+module "networking" {
+  source = "../../modules/networking"
+
+  project_id  = var.project_id
+  environment = var.environment
+  region      = var.region
+  subnet_cidr = var.subnet_cidr
 }
 
-# Subnet 
-resource "google_compute_subnetwork" "data_subnet" {
-  project                  = var.project_id
-  name                     = "${var.environment}-data-subnet"
-  ip_cidr_range            = var.subnet_cidr
-  region                   = var.region
-  network                  = google_compute_network.vpc.id
-  private_ip_google_access = true # Allows VMs to reach Google APIs without public IPs
+# 3. IAM 
+module "iam" {
+  source = "../../modules/iam"
 
-  log_config {
-    aggregation_interval = "INTERVAL_5_SEC"
-    flow_sampling        = 0.5
-    metadata             = "INCLUDE_ALL_METADATA"
-  }
+  project_id  = var.project_id
+  environment = var.environment
 }
 
-# Firewall: deny all ingress by default 
-resource "google_compute_firewall" "deny_all_ingress" {
-  project  = var.project_id
-  name     = "${var.environment}-deny-all-ingress"
-  network  = google_compute_network.vpc.name
-  priority = 65534
+# 4. Storage 
+module "storage" {
+  source = "../../modules/storage"
 
-  deny {
-    protocol = "all"
-  }
+  project_id     = var.project_id
+  environment    = var.environment
+  region         = var.region
+  gcs_kms_key_id = module.security.gcs_kms_key_id
 
-  direction          = "INGRESS"
-  source_ranges      = ["0.0.0.0/0"]
-  destination_ranges = []
-
-  log_config {
-    metadata = "INCLUDE_ALL_METADATA"
-  }
+  depends_on = [module.security]
 }
 
-# Firewall: allow internal traffic within subnet 
-resource "google_compute_firewall" "allow_internal" {
-  project  = var.project_id
-  name     = "${var.environment}-allow-internal"
-  network  = google_compute_network.vpc.name
-  priority = 1000
+# 5. BigQuery 
+module "bigquery" {
+  source = "../../modules/bigquery"
 
-  allow {
-    protocol = "tcp"
-  }
-  allow {
-    protocol = "udp"
-  }
-  allow {
-    protocol = "icmp"
-  }
+  project_id             = var.project_id
+  environment            = var.environment
+  region                 = var.region
+  bigquery_kms_key_id    = module.security.bigquery_kms_key_id
+  data_pipeline_sa_email = module.iam.data_pipeline_sa_email
+  bq_analyst_sa_email    = module.iam.bq_analyst_sa_email
 
-  direction     = "INGRESS"
-  source_ranges = [var.subnet_cidr]
+  depends_on = [module.security, module.iam]
+}
+
+# 6. Monitoring 
+module "monitoring" {
+  source = "../../modules/monitoring"
+
+  project_id               = var.project_id
+  environment              = var.environment
+  log_dataset_id           = module.bigquery.analytics_dataset_id
+  notification_channel_ids = var.notification_channel_ids
+
+  depends_on = [module.bigquery]
 }
