@@ -11,14 +11,11 @@ resource "google_logging_project_sink" "data_platform_sink" {
   }
 }
 
-# Notification Channel: Email notifications for Ops team
-resource "google_monitoring_notification_channel" "emails" {
-  for_each     = var.email_channels
-  display_name = "${each.key} email channel"
-  type         = "email"
-  labels = {
-    email_address = each.value
-  }
+# Grant the sink writer permission to write to the BQ log dataset
+resource "google_project_iam_member" "log_sink_bq_writer" {
+  project = var.project_id
+  role    = "roles/bigquery.dataEditor"
+  member  = google_logging_project_sink.data_platform_sink.writer_identity
 }
 
 # Alert Policy: Dataflow job failure 
@@ -42,7 +39,7 @@ resource "google_monitoring_alert_policy" "dataflow_failure" {
     }
   }
 
-  notification_channels = []
+  notification_channels = var.notification_channel_ids
 
   alert_strategy {
     auto_close = "604800s" # Auto-close after 7 days
@@ -75,7 +72,7 @@ resource "google_monitoring_alert_policy" "bq_job_errors" {
     }
   }
 
-  notification_channels = emails.email_address
+  notification_channels = var.notification_channel_ids
 
   user_labels = {
     environment = var.environment
