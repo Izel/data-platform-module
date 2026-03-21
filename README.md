@@ -68,8 +68,8 @@ All modules are independently reusable and composable. Each environment (`dev`, 
  
 - Terraform >= 1.5.0
 - Google Cloud SDK (`gcloud`)
-- A GCP project with billing enabled
-- A GCS bucket for Terraform remote state
+- A [GCP project] (https://developers.google.com/workspace/guides/create-project) with [billing enabled](https://docs.cloud.google.com/billing/docs/how-to/modify-project)
+- A GCS bucket named `<YOUR_PROJECT_ID>-<YOUR_ENVIRONMENT>-tf-state` for Terraform remote state. 
  
 ---
 
@@ -82,19 +82,14 @@ git clone https://github.com/Izel/data-platform-module.git
 cd data-platform-module
 ```
  
-### 2. Project Set Up
-
-1. [Create a project](https://developers.google.com/workspace/guides/create-project) via web console
-2. Associate the project to a [billing account](https://docs.cloud.google.com/billing/docs/how-to/modify-project).
-
-### 3. Authenticate with GCP
+### 2. Authenticate with GCP
  
 ```bash
 gcloud auth login
 gcloud config set project <YOUR_PROJECT_ID>
 ```
  
-### 3. Configure your environment
+### 3. Environment configuration
  
 Create the `terraform.tfvars` file per environment:
 ```
@@ -107,7 +102,7 @@ Create the `terraform.tfvars` file per environment:
 │      ├── terraform.tfvars  
 ```
 
-4. Edit the variable definitions below for each `terraform.tfvars` according to your values and environment:
+### 4. Edit the variable definitions below for each `terraform.tfvars` according to your values and environment:
 ```bash
 # The project id  created in GCP. It must be associated to a billing account
 project_id = "<YOUR_PROJECT_ID>" # p.e "my-data-infra-project"
