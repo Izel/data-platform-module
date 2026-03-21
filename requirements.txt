@@ -1,2 +1,7 @@
-google-cloud-resource-manager 
-google-auth
+google-cloud-resource-manager>=1.10.0
+google-cloud-storage>=2.10.0
+google-cloud-bigquery>=3.11.0
+google-cloud-secret-manager>=2.16.0
+google-cloud-monitoring>=2.15.0
+google-auth>=2.22.0
+tenacity>=8.2.0
