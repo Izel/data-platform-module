@@ -91,7 +91,7 @@ gcloud config set project <YOUR_PROJECT_ID>
  
 ### 3. Environment configuration
  
-Create the `terraform.tfvars` file per environment:
+1. Create the `terraform.tfvars` file per environment:
 ```
 ├── environments\
 │   ├── dev\
@@ -102,7 +102,7 @@ Create the `terraform.tfvars` file per environment:
 │      ├── terraform.tfvars  
 ```
 
-### 4. Edit the variable definitions below for each `terraform.tfvars` according to your values and environment:
+2. Edit the variable definitions below for each `terraform.tfvars` according to your values and environment:
 ```bash
 # The project id  created in GCP. It must be associated to a billing account
 project_id = "<YOUR_PROJECT_ID>" # p.e "my-data-infra-project"
