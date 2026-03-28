@@ -30,7 +30,7 @@ data-platform-module\
 │   └── monitoring\
 ├── environments\
 │   ├── dev\
-│   ├── staging\
+│   ├── pre\
 │   └── prod\
 └── README.md
 
@@ -51,25 +51,16 @@ environments/
   └─────────────────────────────────────────┘
 ```
  
-All modules are independently reusable and composable. Each environment (`dev`, `pre`, `prod`) references the same modules with environment-specific variable overrides via `terraform.tfvars`.\
-See more details `/assets/architecture/README.md`.
+All modules are independently reusable and composable. Each environment (`dev`, `pre`, `prod`) references the same modules with environment-specific variable overrides via `terraform.tfvars`.  
+
+See more details about the architecture, patterns and design decisions, see the [architecture](/assets/architecture/README.md) document.
 
 ---
 
-## Key Design Decisions
-
-- **CMEK everywhere** All GCS buckets and BigQuery datasets encrypted with Customer Managed Encryption Keys via Cloud KMS.
-- **Least-privilege IAM** Dedicated service accounts per workload and no primitive roles (`Owner`, `Editor`).
-- **Private by default** Private Google Access enabled. The data resources have no public IPs.
-- **Secrets never in state** All credentials managed via Secret Manager and no plain text secrets in `.tfvars`, environment variables or state files.
-- **Environment parity** Dev, staging, and prod use identical module composition, the differences are tfvars only.
- 
----
- 
 ## Prerequisites
  
 - Terraform >= 1.5.0
-- Google Cloud SDK (`gcloud`)
+- [Google Cloud SDK](https://docs.cloud.google.com/sdk/docs/install-sdk) (`gcloud`)
 - A [GCP project](https://developers.google.com/workspace/guides/create-project) with [billing enabled](https://docs.cloud.google.com/billing/docs/how-to/modify-project)
 - A GCS bucket named `<YOUR_PROJECT_ID>-<YOUR_ENVIRONMENT>-tf-state` for Terraform remote state. 
  
@@ -145,7 +136,7 @@ Environments share identical module composition. To promote from dev → pre →
 # Validate dev
 cd environments/dev && terraform plan
  
-# Promote to staging
+# Promote to pre
 cd environments/pre && terraform plan && terraform apply
  
 # Promote to prod
