@@ -2,8 +2,15 @@
 # Modules definition
 #
 
-# 1. Security (KMS + Secret Manager)
-# All other modules depend on KMS key IDs
+# 1.All other modules require these APIs to be active
+module "apis" {
+  source = "../../modules/apis"
+
+  project_id    = var.project_id
+  required_apis = var.required_apis
+}
+
+# 2. Security (KMS + Secret Manager)
 module "security" {
   source = "../../modules/security"
 
@@ -11,9 +18,10 @@ module "security" {
   environment         = var.environment
   region              = var.region
   key_rotation_period = var.key_rotation_period
+  depends_on          = [module.apis]
 }
 
-# 2. Networking
+# 3. Networking
 module "networking" {
   source = "../../modules/networking"
 

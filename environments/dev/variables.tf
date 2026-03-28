@@ -16,6 +16,13 @@ variable "region" {
   type        = string
   default     = "europe-west2"
 }
+
+variable "required_apis" {
+  description = "Override list of APIs to enable. Defaults to the module's built-in list."
+  type        = list(string)
+  default     = []
+}
+
 variable "subnet_cidr" {
   description = "CIDR for defining IP address ranges and network masks."
   type        = string
