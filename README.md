@@ -21,6 +21,7 @@ A **GCP** production-ready, reusable **Terraform module** that provisions a secu
 data-platform-module\
 ├── scripts\
 ├── modules\
+│   ├── apis\
 │   ├── networking\
 │   ├── iam\
 │   ├── storage\
@@ -39,19 +40,20 @@ data-platform-module\
  
 ```
 environments/
-  dev | staging | prod
+  dev | pre | prod
         │
         ▼
   ┌─────────────────────────────────────────┐
   │           modules/                      │
-  │  networking → iam → security            │
-  │       ↓         ↓        ↓              │
-  │   storage   bigquery  monitoring        │
+  │  apis → networking → iam → security     │
+  │         ↓         ↓        ↓            │
+  │     storage   bigquery  monitoring      │
   └─────────────────────────────────────────┘
 ```
  
-All modules are independently reusable and composable. Each environment (`dev`, `staging`, `prod`) references the same modules with environment-specific variable overrides via `terraform.tfvars`.
- 
+All modules are independently reusable and composable. Each environment (`dev`, `pre`, `prod`) references the same modules with environment-specific variable overrides via `terraform.tfvars`.\
+See more details `/assets/architecture/README.md`.
+
 ---
 
 ## Key Design Decisions
@@ -68,7 +70,7 @@ All modules are independently reusable and composable. Each environment (`dev`, 
  
 - Terraform >= 1.5.0
 - Google Cloud SDK (`gcloud`)
-- A [GCP project] (https://developers.google.com/workspace/guides/create-project) with [billing enabled](https://docs.cloud.google.com/billing/docs/how-to/modify-project)
+- A [GCP project](https://developers.google.com/workspace/guides/create-project) with [billing enabled](https://docs.cloud.google.com/billing/docs/how-to/modify-project)
 - A GCS bucket named `<YOUR_PROJECT_ID>-<YOUR_ENVIRONMENT>-tf-state` for Terraform remote state. 
  
 ---
@@ -96,7 +98,7 @@ gcloud config set project <YOUR_PROJECT_ID>
 ├── environments\
 │   ├── dev\
 │      ├── terraform.tfvars  
-│   ├── staging\
+│   ├── pre\
 │      ├── terraform.tfvars  
 │   ├── prod\
 │      ├── terraform.tfvars  
@@ -137,14 +139,14 @@ terraform apply tfplan
 
 ## Environment Promotion
  
-Environments share identical module composition. To promote from dev → staging → prod:
+Environments share identical module composition. To promote from dev → pre → prod:
  
 ```bash
 # Validate dev
 cd environments/dev && terraform plan
  
 # Promote to staging
-cd environments/staging && terraform plan && terraform apply
+cd environments/pre && terraform plan && terraform apply
  
 # Promote to prod
 cd environments/prod && terraform plan && terraform apply
