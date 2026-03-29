@@ -76,26 +76,26 @@ resource "google_storage_bucket" "processed" {
   }
 }
 
-# Terraform State Bucket 
-resource "google_storage_bucket" "tf_state" {
-  project                     = var.project_id
-  name                        = "${var.project_id}-${var.environment}-tf-state"
-  location                    = var.region
-  storage_class               = "STANDARD"
-  uniform_bucket_level_access = true
-  force_destroy               = false # Never destroy state bucket
+# # Terraform State Bucket 
+# resource "google_storage_bucket" "tf_state" {
+#   project                     = var.project_id
+#   name                        = "${var.project_id}-${var.environment}-tf-state"
+#   location                    = var.region
+#   storage_class               = "STANDARD"
+#   uniform_bucket_level_access = true
+#   force_destroy               = false # Never destroy state bucket
 
-  encryption {
-    default_kms_key_name = var.gcs_kms_key_id
-  }
+#   encryption {
+#     default_kms_key_name = var.gcs_kms_key_id
+#   }
 
-  versioning {
-    enabled = true # Essential for state file history and recovery
-  }
+#   versioning {
+#     enabled = true # Essential for state file history and recovery
+#   }
 
-  labels = {
-    environment = var.environment
-    layer       = "infrastructure"
-    managed_by  = "terraform"
-  }
-}
+#   labels = {
+#     environment = var.environment
+#     layer       = "infrastructure"
+#     managed_by  = "terraform"
+#   }
+#}
