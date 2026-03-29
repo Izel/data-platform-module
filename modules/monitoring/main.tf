@@ -85,7 +85,7 @@ resource "google_logging_metric" "bq_job_errors" {
 
 # Alert Policy: BigQuery job errors 
 # fires when the log-based metric above exceeds the threshold.
-# It means, more than N BigQuery errors have occurred in a 5-minute window.
+# It means, more than N BigQuery errors have occurred in a 5 min window.
 resource "google_monitoring_alert_policy" "bq_job_errors" {
   project      = var.project_id
   display_name = "[${upper(var.environment)}] BigQuery Job Errors"
@@ -96,7 +96,7 @@ resource "google_monitoring_alert_policy" "bq_job_errors" {
 
     condition_threshold {
       # Reference the log-based metric we created above
-      filter     = "metric.type=\"logging.googleapis.com/user/${var.environment}-bq-job-errors\" resource.type=\"bigquery_resource\""
+      filter     = "metric.type=\"logging.googleapis.com/user/${var.environment}-bq-job-errors\" resource.type=\"global\""
       duration   = "0s" # Fire immediately when threshold is crossed. No sustained period required
       comparison = "COMPARISON_GT"
 
