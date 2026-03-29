@@ -36,7 +36,7 @@ module "networking" {
   depends_on  = [time_sleep.wait_for_apis]
 }
 
-# 2. Security (KMS + Secret Manager)
+# 4. Security (KMS + Secret Manager)
 module "security" {
   source = "../../modules/security"
 
