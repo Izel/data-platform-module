@@ -77,13 +77,13 @@ The medallion architecture — also known as the Delta Architecture or multi-hop
 Defence in depth is a security architecture principle in which multiple independent security controls protect data at every layer. No single control failure exposes the data.
 
 ```
-┌─────────────────────────────────────────────────────┐
+┌───────────────────────────────────────────────────────┐
 │  Layer 1 — Network        VPC · Private Google Access│
 │  Layer 2 — Identity       Least-privilege IAM · SAs  │
 │  Layer 3 — Encryption     CMEK · KMS key rotation    │
 │  Layer 4 — Secrets        Secret Manager             │
 │  Layer 5 — Observability  Logging · Monitoring       │
-└─────────────────────────────────────────────────────┘
+└───────────────────────────────────────────────────────┘
 ```
 
 Each layer is implemented by a dedicated Terraform module, making controls independently auditable and replaceable.
@@ -120,6 +120,10 @@ Each module encapsulates a single infrastructure concern. Modules are deliberate
 ```
                     ┌─────────────┐
                     │    apis     │  ← All modules depend on this
+                    └──────┬──────┘
+                           │
+                    ┌──────▼──────┐
+                    │ apis_ready  │  ← Time sleep waiting for APIs propagation
                     └──────┬──────┘
                            │
           ┌────────────────┼────────────────┐
@@ -164,10 +168,10 @@ Each module encapsulates a single infrastructure concern. Modules are deliberate
 ### Data Flow
 
 ```
-Source Data
-    │
-    │  ingestion (Dataflow · Pub/Sub · batch)
-    ▼
+            Source Data
+                │
+                │  ingestion (Dataflow · Pub/Sub · batch)
+                ▼
 ┌───────────────────────────────────┐
 │  RAW LAYER                        │
 │  GCS: {project}-{env}-raw/        │
