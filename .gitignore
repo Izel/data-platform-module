@@ -3,3 +3,4 @@ environments/*/terraform.tfvars
 environments/*/.terraform/*
 environments/*/*.terraform.*
 environments/*/tfplan
+environments/*/backend.tf
