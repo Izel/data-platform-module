@@ -63,7 +63,7 @@ See more details about the architecture, patterns and design decisions, see the 
 - [Google Cloud SDK](https://docs.cloud.google.com/sdk/docs/install-sdk) (`gcloud`)
 - A [GCP project](https://developers.google.com/workspace/guides/create-project) with [billing enabled](https://docs.cloud.google.com/billing/docs/how-to/modify-project)
 - A GCS bucket named `<YOUR_PROJECT_ID>-<YOUR_ENVIRONMENT>-tf-state` for Terraform remote state. 
- 
+
 ---
 
 ## Usage
@@ -121,7 +121,7 @@ notification_channel_ids = []
 ### 5. Deploy
  
 ```bash
-terraform init
+terraform init  
 terraform plan -out=tfplan
 terraform apply tfplan
 ```
