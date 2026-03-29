@@ -51,28 +51,71 @@ resource "google_monitoring_alert_policy" "dataflow_failure" {
   }
 }
 
+# Log-Based Metric: BigQuery job errors 
+# Counts BigQuery ERROR log entries.
+# Cloud Logging captures all BQ job activity, this metric increments each
+# time a log entry with severity=ERROR appears for a BigQuery resource.
+resource "google_logging_metric" "bq_job_errors" {
+  project = var.project_id
+  name    = "${var.environment}-bq-job-errors"
+
+  # Filter matches any ERROR-level log entry from BigQuery jobs
+  filter = <<-EOT
+    resource.type="bigquery_resource"
+    AND severity=ERROR
+  EOT
+
+  metric_descriptor {
+    metric_kind = "DELTA" # Counts new errors in each time window (not cumulative)
+    value_type  = "INT64" # Integer count of error occurrences
+    unit        = "1"
+
+    labels {
+      key         = "error_code"
+      value_type  = "STRING"
+      description = "The BigQuery error code from the log entry"
+    }
+  }
+
+  label_extractors = {
+    # Pulls the error code out of the log payload so alerts show which error occurred
+    "error_code" = "EXTRACT(protoPayload.status.code)"
+  }
+}
+
 # Alert Policy: BigQuery job errors 
+# fires when the log-based metric above exceeds the threshold.
+# It means, more than N BigQuery errors have occurred in a 5-minute window.
 resource "google_monitoring_alert_policy" "bq_job_errors" {
   project      = var.project_id
   display_name = "[${upper(var.environment)}] BigQuery Job Errors"
   combiner     = "OR"
 
   conditions {
-    display_name = "BigQuery job error rate elevated"
+    display_name = "BigQuery error log entries exceeded threshold"
+
     condition_threshold {
-      filter          = "metric.type=\"bigquery.googleapis.com/storage/table_count\" resource.type=\"bigquery_dataset\""
-      duration        = "300s"
-      comparison      = "COMPARISON_GT"
+      # Reference the log-based metric we created above
+      filter     = "metric.type=\"logging.googleapis.com/user/${var.environment}-bq-job-errors\" resource.type=\"bigquery_resource\""
+      duration   = "0s" # Fire immediately when threshold is crossed. No sustained period required
+      comparison = "COMPARISON_GT"
+
+      # Fires when more than N errors occur in the alignment window
       threshold_value = var.bq_error_threshold
 
       aggregations {
-        alignment_period   = "300s"
-        per_series_aligner = "ALIGN_RATE"
+        alignment_period   = "300s"      # 5-minute window. Counts all errors in each 5-min bucket
+        per_series_aligner = "ALIGN_SUM" # ALIGN_SUM counts all error counts within the window
       }
     }
   }
 
   notification_channels = var.notification_channel_ids
+
+  # Prevents alert storms. if the alert fires, wait 5 min before re-notifying
+  alert_strategy {
+    auto_close = "604800s" # close after 7 days if not resolved
+  }
 
   user_labels = {
     environment = var.environment

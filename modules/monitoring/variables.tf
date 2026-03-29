@@ -22,5 +22,5 @@ variable "notification_channel_ids" {
 variable "bq_error_threshold" {
   description = "BigQuery error rate threshold to trigger an alert"
   type        = number
-  default     = 5
+  default     = 25
 }
