@@ -3,6 +3,7 @@ variable "project_id" {
   description = "GCP project ID."
   type        = string
 }
+
 variable "environment" {
   description = "Environment name for the current deployment."
   type        = string
@@ -11,6 +12,7 @@ variable "environment" {
     error_message = "The environment variable value must be one of: dev, staging, prd"
   }
 }
+
 variable "region" {
   description = "Primary region for project resources provisioning"
   type        = string
@@ -20,7 +22,6 @@ variable "region" {
 variable "required_apis" {
   description = "Override list of APIs to enable. Defaults to the module's built-in list."
   type        = list(string)
-  default     = []
 }
 
 variable "subnet_cidr" {

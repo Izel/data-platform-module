@@ -10,15 +10,19 @@ module "apis" {
   required_apis = var.required_apis
 }
 
-# 2. Security (KMS + Secret Manager)
-module "security" {
-  source = "../../modules/security"
+# 1.1 GCP requires time to propagate the APIs enabeling. 
+resource "time_sleep" "wait_for_apis" {
+  create_duration = "360s" # Waits for 6 minutes for the APIs provisioning
+  depends_on      = [module.apis]
+}
 
-  project_id          = var.project_id
-  environment         = var.environment
-  region              = var.region
-  key_rotation_period = var.key_rotation_period
-  depends_on          = [module.apis]
+# 2. IAM 
+module "iam" {
+  source = "../../modules/iam"
+
+  project_id  = var.project_id
+  environment = var.environment
+  depends_on  = [time_sleep.wait_for_apis]
 }
 
 # 3. Networking
@@ -29,14 +33,18 @@ module "networking" {
   environment = var.environment
   region      = var.region
   subnet_cidr = var.subnet_cidr
+  depends_on  = [time_sleep.wait_for_apis]
 }
 
-# 3. IAM 
-module "iam" {
-  source = "../../modules/iam"
+# 2. Security (KMS + Secret Manager)
+module "security" {
+  source = "../../modules/security"
 
-  project_id  = var.project_id
-  environment = var.environment
+  project_id          = var.project_id
+  environment         = var.environment
+  region              = var.region
+  key_rotation_period = var.key_rotation_period
+  depends_on          = [time_sleep.wait_for_apis]
 }
 
 # 4. Storage 

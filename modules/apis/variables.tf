@@ -7,13 +7,13 @@ variable "required_apis" {
   description = "List of GCP APIs to enable for the data platform"
   type        = list(string)
   default = [
+    # Networking 
+    "compute.googleapis.com", # VPC, subnets, firewall rules
+
     # Core Platform 
     "cloudresourcemanager.googleapis.com", # Required by Terraform itself
     "iam.googleapis.com",                  # IAM service accounts and bindings
     #"iamcredentials.googleapis.com",       # Workload Identity / SA token generation
-
-    # Networking 
-    "compute.googleapis.com", # VPC, subnets, firewall rules
 
     # Data Storage 
     "storage.googleapis.com",  # Cloud Storage (GCS)
