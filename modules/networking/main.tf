@@ -30,7 +30,7 @@ resource "google_compute_subnetwork" "data_subnet" {
 resource "google_compute_firewall" "deny_all_ingress" {
   project  = var.project_id
   name     = "${var.environment}-deny-all-ingress"
-  network  = google_compute_network.vpc.name
+  network  = google_compute_network.vpc.id
   priority = 65534
 
   deny {
@@ -50,7 +50,7 @@ resource "google_compute_firewall" "deny_all_ingress" {
 resource "google_compute_firewall" "allow_internal" {
   project  = var.project_id
   name     = "${var.environment}-allow-internal"
-  network  = google_compute_network.vpc.name
+  network  = google_compute_network.vpc.id
   priority = 1000
 
   allow {
